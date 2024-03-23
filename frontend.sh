@@ -1,4 +1,7 @@
+code_dir=${pwd}
+
 echo -e "\e[32mInstalling Nginx \e[0m"
+
 dnf install nginx -y
 
 echo -e "\e[32mRemoving Old Content \e[0m"
@@ -13,7 +16,7 @@ cd /usr/share/nginx/html
 unzip /tmp/frontend.zip
 
 echo -e "\e[32mCopying Configs \e[0m"
-cp /configs/nginx.roboshop.config /etc/nginx/default.d/roboshop.conf
+cp {code_dir} /configs/nginx.roboshop.config /etc/nginx/default.d/roboshop.conf
 
 
 echo -e "\e[32mEnabling Nginx \e[0m"
