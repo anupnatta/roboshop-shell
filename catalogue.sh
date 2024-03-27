@@ -1,3 +1,4 @@
+code_dir=$(pwd)
 
 dnf module disable nodejs -y
 
@@ -13,7 +14,7 @@ unzip /tmp/catalogue.zip
 cd /app
 npm install
 
-cp /configs/catalogue.service /etc/systemd/system/catalogue.service
+cp {code_dir}/configs/catalogue.service /etc/systemd/system/catalogue.service
 
 systemctl daemon-reload
 systemctl enable catalogue
