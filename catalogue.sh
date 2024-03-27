@@ -1,4 +1,4 @@
-code_dir=$(pwd)
+
 
 dnf module disable nodejs -y
 
@@ -14,13 +14,13 @@ unzip /tmp/catalogue.zip
 cd /app
 npm install
 
-cp {code_dir}/configs/catalogue.service /etc/systemd/system/catalogue.service
+cp roboshop-shell/configs/catalogue.service /etc/systemd/system/catalogue.service
 
 systemctl daemon-reload
 systemctl enable catalogue
 systemctl start catalogue
 
-cp config/mongodb.repo /etc/yum.repos.d/mongo.repo
+cp configs/mongodb.repo /etc/yum.repos.d/mongo.repo
 
 dnf install mongodb-org-shell -y
 
