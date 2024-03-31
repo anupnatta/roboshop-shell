@@ -1,9 +1,9 @@
 source common.sh
 
 print_head "Enabling nodejs"
-dnf module disable nodejs -y
-dnf module enable nodejs:18 -y
-dnf install nodejs -y
+dnf module disable nodejs -y &>>{log_file}
+dnf module enable nodejs:18 -y &>>{log_file}
+dnf install nodejs -y &>>{log_file}
 
 print_head "Roboshop UserAdd"
 useradd roboshop
@@ -13,11 +13,11 @@ print_head "Removing Old Content"
 rm -rf /app/*
 
 print_head "Downloading Catalogue Artifacts"
-curl -o /tmp/catalogue.zip https://roboshop-artifacts.s3.amazonaws.com/catalogue.zip
+curl -o /tmp/catalogue.zip https://roboshop-artifacts.s3.amazonaws.com/catalogue.zip &>>{log_file}
 
 print_head "Unzipping catalogue.zip"
 cd /app
-unzip /tmp/catalogue.zip
+unzip /tmp/catalogue.zip &>>{log_file}
 cd /app
 
 
