@@ -25,7 +25,7 @@ print_head "Downloading Node JS Dependencies"
 npm install
 
 print_head "Copying Catalogue Config files"
-cp ${code_dir}/configs/catalogue.service /etc/systemd/system/catalogue.service
+cp ${code_dir}/configs/catalogue.service /etc/systemd/system/catalogue.service &>>{log_file}
 
 
 print_head "Reloading System D"
@@ -36,9 +36,9 @@ print_head "Starting Catalogue"
 
 systemctl start catalogue
 print_head "Copying MongoDB Configs"
-cp ${code_dir}/configs/mongodb.repo /etc/yum.repos.d/mongo.repo
+cp ${code_dir}/configs/mongodb.repo /etc/yum.repos.d/mongo.repo &>>{log_file}
 print_head "Installing Mongo Client"
-dnf install mongodb-org-shell -y
+dnf install mongodb-org-shell -y &>>{log_file}
 
 print_head "Loading Schema"
 mongo --host mongodb.devops69.online </app/schema/catalogue.js
