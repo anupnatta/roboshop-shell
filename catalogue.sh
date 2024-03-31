@@ -36,7 +36,7 @@ print_head "Starting Catalogue"
 
 systemctl start catalogue
 print_head "Copying MongoDB Configs"
-cp /configs/mongodb.repo /etc/yum.repos.d/mongo.repo
+cp ${code_dir}/configs/mongodb.repo /etc/yum.repos.d/mongo.repo
 print_head "Installing Mongo Client"
 dnf install mongodb-org-shell -y
 
