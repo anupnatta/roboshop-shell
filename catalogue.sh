@@ -1,4 +1,4 @@
-source common.sh
+#source common.sh
 
 print_head "Enabling nodejs"
 dnf module disable nodejs -y &>>{log_file}
