@@ -22,7 +22,7 @@ fi
 status_check $?
 
 print_head "Downloading the App Code"
-curl -L -o /tmp/user.zip https://roboshop-artifacts.s3.amazonaws.com/user.zip $>>{log_file}
+curl -L -o /tmp/user.zip https://roboshop-artifacts.s3.amazonaws.com/user.zip
 cd /app
 status_check $?
 
