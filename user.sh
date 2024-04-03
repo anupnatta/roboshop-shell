@@ -1,40 +1,43 @@
 source common.sh
 
-print_head "Enabling NODE JS"
+print_head "Enabling nodejs"
 dnf module disable nodejs -y &>>{log_file}
 dnf module enable nodejs:18 -y &>>{log_file}
-status_check $?
-
-print_head "Install NodeJS"
 dnf install nodejs -y &>>{log_file}
 status_check $?
 
-print_head "Roboshop User ADD"
+print_head "Roboshop UserAdd"
+id roboshop &>>{log_file}
 if [ $? -ne 0 ]; then
-  useradd roboshop $>> {log_file}
+  useradd roboshop &>>{log_file}
 fi
 status_check $?
 
-print_head "Creating APP directory"
-if [ $? -ne 0 ]; then
-mkdir /app $>>{log_file}
+print_head "Creating App Directory"
+if [ ! -d /app ]; then
+  mkdir /app &>>{log_file}
 fi
 status_check $?
 
-print_head "Downloading the App Code"
-curl -L -o /tmp/user.zip https://roboshop-artifacts.s3.amazonaws.com/user.zip &>>{log_file
+print_head "Removing Old Content"
+rm -rf /app/*
 status_check $?
 
-print_head "Unzipping User.zip"
-unzip /tmp/user.zip &>>{log_file}
+print_head "Downloading user Artifacts"
+curl -o /tmp/user.zip https://roboshop-artifacts.s3.amazonaws.com/user.zip &>>{log_file}
 status_check $?
 
-print_head "Downloading NodeJS Dependencies"
+print_head "Unzipping user.zip"
 cd /app
+unzip /tmp/user.zip &>>{log_file}
+cd /app
+status_check $?
+
+print_head "Downloading Node JS Dependencies"
 npm install &>>{log_file}
 status_check $?
 
-print_head "Copying User Config files"
+print_head "Copying user Config files"
 cp ${code_dir}/configs/user.service /etc/systemd/system/user.service &>>{log_file}
 status_check $?
 
@@ -42,11 +45,11 @@ print_head "Reloading System D"
 systemctl daemon-reload
 status_check $?
 
-print_head "Enabling User"
+print_head "Enabling user"
 systemctl enable user
 status_check $?
 
-print_head "Starting User"
+print_head "Starting user"
 systemctl start user
 status_check $?
 
@@ -61,6 +64,3 @@ status_check $?
 print_head "Loading Schema"
 mongo --host mongodb.devops69.online </app/schema/user.js
 status_check $?
-
-
-
