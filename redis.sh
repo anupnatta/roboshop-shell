@@ -1,4 +1,4 @@
-souce common.sh
+source common.sh
 
 print_head "Installing Redis Repo Files"
 dnf install https://rpms.remirepo.net/enterprise/remi-release-8.rpm -y &>>{log_file}
