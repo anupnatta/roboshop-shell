@@ -1,4 +1,4 @@
-#source common.sh
+source common.sh
 
 print_head "Installing Nginx"
 dnf install nginx -y &>>{log_file}
