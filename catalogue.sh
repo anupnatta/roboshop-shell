@@ -14,7 +14,7 @@ fi
 status_check $?
 
 print_head "Creating App Directory"
-if [ $? -ne 0 ]; then
+if [ ! -d /app ]; then
   mkdir /app &>>{log_file}
 fi
 status_check $?
