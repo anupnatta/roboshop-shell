@@ -2,7 +2,7 @@ source common.sh
 
 print_head "Enabling NODE JS"
 dnf module disable nodejs -y &>>{log_file}
-dnf module enable nodejs:18 -y
+dnf module enable nodejs:18 -y &>>{log_file}
 status_check $?
 
 print_head "Install NodeJS"
@@ -23,7 +23,7 @@ status_check $?
 
 print_head "Downloading the App Code"
 curl -L -o /tmp/user.zip https://roboshop-artifacts.s3.amazonaws.com/user.zip $>>{log_file}
-cd /app $>>{log_file}
+cd /app
 status_check $?
 
 print_head "Unzipping User.zip"
@@ -44,11 +44,11 @@ systemctl daemon-reload
 status_check $?
 
 print_head "Enabling User"
-systemctl enable catalogue
+systemctl enable user
 status_check $?
 
 print_head "Starting User"
-systemctl start catalogue
+systemctl start user
 status_check $?
 
 print_head "Copying MongoDB Configs"
