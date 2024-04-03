@@ -1,8 +1,12 @@
 source common.sh
 
 print_head "Installing Nginx"
-
 dnf install nginx -y
+if {$? -eq 0}; then
+  echo SUCCESS
+else
+  echo FAILED
+fi
 
 print_head "Removing Old Content"
 
