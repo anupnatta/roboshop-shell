@@ -2,7 +2,7 @@ source common.sh
 
 print_head "Copying MongoDB config files and setting up MongoDB repo"
 
-cp ${code_dir}configs/mongodb.repo /etc/yum.repos.d/mongo.repo &>>{log_file}
+cp ${code_dir}/configs/mongodb.repo /etc/yum.repos.d/mongo.repo &>>{log_file}
 status_check $?
 
 print_head "Installing MongoDB"
