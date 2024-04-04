@@ -8,7 +8,7 @@ source common.sh
 #fi
 
 print_head "Disabling MYSQL"
-dnf module disable mysql -y $>>{log_file}
+dnf module disable mysql -y &>>{log_file}
 status_check $?
 
 print_head "Copying MYSQL repo files"
