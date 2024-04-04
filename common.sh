@@ -73,7 +73,6 @@ print_head "Copying MongoDB Configs"
 cp ${code_dir}/configs/mongodb.repo /etc/yum.repos.d/mongo.repo &>>{log_file}
 status_check $?
 
-}
 print_head "Installing Mongo Client"
 dnf install mongodb-org-shell -y &>>{log_file}
 
@@ -82,4 +81,4 @@ status_check $?
 print_head "Loading Schema"
 mongo --host mongodb.devops69.online </app/schema/${component}.js
 status_check $?
-
+}
