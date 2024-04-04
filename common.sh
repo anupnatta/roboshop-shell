@@ -31,7 +31,7 @@ schema_setup(){
   fi
 }
 
-NODEJS(){
+nodejs(){
 
 print_head "Enabling nodejs"
 dnf module disable nodejs -y &>>{log_file}
