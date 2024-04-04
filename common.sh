@@ -13,6 +13,24 @@ status_check() {
     echo -e "\e[31mFAILED\e[0m"
   fi
 }
+
+schema_setup(){
+  if [ "schema_type" = "mongo"]; then
+    print_head "Copying MongoDB Configs"
+    cp ${code_dir}/configs/mongodb.repo /etc/yum.repos.d/mongo.repo &>>{log_file}
+    status_check $?
+
+    print_head "Installing Mongo Client"
+    dnf install mongodb-org-shell -y &>>{log_file}
+
+    status_check $?
+
+    print_head "Loading Schema"
+    mongo --host mongodb.devops69.online </app/schema/${component}.js
+    status_check $?
+  fi
+}
+
 NODEJS(){
 
 print_head "Enabling nodejs"
@@ -69,16 +87,5 @@ print_head "Starting ${component}"
 systemctl start ${component}
 status_check $?
 
-print_head "Copying MongoDB Configs"
-cp ${code_dir}/configs/mongodb.repo /etc/yum.repos.d/mongo.repo &>>{log_file}
-status_check $?
-
-print_head "Installing Mongo Client"
-dnf install mongodb-org-shell -y &>>{log_file}
-
-status_check $?
-
-print_head "Loading Schema"
-mongo --host mongodb.devops69.online </app/schema/${component}.js
-status_check $?
+schema_setup
 }

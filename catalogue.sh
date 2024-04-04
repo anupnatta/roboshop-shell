@@ -1,7 +1,8 @@
 source common.sh
 
 component=catalogue
-NODEJS
+schema_type=mongo
+nodejs
 
 #print_head "Enabling nodejs"
 #dnf module disable nodejs -y &>>{log_file}
