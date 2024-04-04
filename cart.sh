@@ -3,6 +3,8 @@ source common.sh
 component=cart
 nodejs
 
+
+
 #print_head "Enabling nodejs"
 #dnf module disable nodejs -y &>>{log_file}
 #dnf module enable nodejs:18 -y &>>{log_file}
