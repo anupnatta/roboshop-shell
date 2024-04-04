@@ -11,6 +11,10 @@ print_head "Disabling MYSQL"
 dnf module disable mysql -y $>>{log_file}
 status_check $?
 
+print_head "Copying MYSQL repo files"
+cp {code_dir}/configs/roboshop-shell /etc/yum.repos.d/mysql.repo &>>{log_file}
+status_check $?
+
 print_head "Installing MYSQL Server"
 dnf install mysql-community-server -y &>>{log_file}
 status_check $?
