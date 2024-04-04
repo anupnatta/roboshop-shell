@@ -1,11 +1,11 @@
 source common.sh
 #password = RoboShop@1
 
-mysql_root_password=$1
-if [ -z "${mysql_root_paswword}" ]; then
-  echo -e "\e[31mMissing MYSQL Password argument\e[0m"
-  exit 1
-fi
+#mysql_root_password=$1
+#if [ -z "${mysql_root_paswword}" ]; then
+#  echo -e "\e[31mMissing MYSQL Password argument\e[0m"
+#  exit 1
+#fi
 
 print_head "Disabling MYSQL"
 dnf module disable mysql -y $>>{log_file}
