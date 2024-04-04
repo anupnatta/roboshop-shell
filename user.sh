@@ -53,8 +53,6 @@ NODEJS
 #status_check $?
 #
 #print_head "Starting user"
-#mongo --host mongodb.devops69.online </app/schema/user.js
-#status_check $?
 #systemctl start user
 #status_check $?
 #
@@ -67,3 +65,5 @@ NODEJS
 #status_check $?
 #
 #print_head "Loading Schema"
+#mongo --host mongodb.devops69.online </app/schema/user.js
+#status_check $?
