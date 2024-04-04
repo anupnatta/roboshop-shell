@@ -6,6 +6,7 @@ if [ -z "${mysql_root_paswword}" ]; then
   echo -e "\e[31mMissing MYSQL Password argument\e[0m"
   exit 1
 fi
+
 print_head "Disabling MYSQL"
 dnf module disable mysql -y $>>{log_file}
 status_check $?
@@ -23,7 +24,10 @@ systemctl start mysqld &>>{log_file}
 status_check $?
 
 print_head "Root Password Setup"
-echo show database | mysql -uroot -p${mysql_root_password} $>>{log_file}
-if [ $? -ne 0 ]; then
-  mysql_secure_installation --set-root-pass ${mysql_root_password} $>>{log_file}
-fi
+mysql_secure_installation --set-root-pass ${mysql_root_password}
+status_check $?
+
+#echo show database | mysql -uroot -p${mysql_root_password} $>>{log_file}
+#if [ $? -ne 0 ]; then
+#  mysql_secure_installation --set-root-pass ${mysql_root_password} $>>{log_file}
+#fi
