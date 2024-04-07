@@ -1,91 +1,147 @@
 code_dir=$(pwd)
 log_file=/tmp/roboshop.log
-rm -f {log_file}
+rm -f ${log_file}
 
 print_head() {
-  echo -e "\e[34m$1\e[0m"
+  echo -e "\e[36m$1\e[0m"
 }
 
 status_check() {
   if [ $1 -eq 0 ]; then
-    echo -e "\e[32mSUCCESS\e[0m"
+    echo SUCCESS
   else
-    echo -e "\e[31mFAILED\e[0m"
+    echo FAILURE
+    echo "Read the log file ${log_file} for more information about error"
+    exit 1
   fi
 }
 
-schema_setup(){
-  if [ "$schema_type" == "mongo" ]; then
-    print_head "Copying MongoDB Configs"
-    cp ${code_dir}/configs/mongodb.repo /etc/yum.repos.d/mongo.repo &>>{log_file}
+systemd_setup() {
+  print_head "Copy SystemD Service File"
+  cp ${code_dir}/configs/${component}.service /etc/systemd/system/${component}.service &>>${log_file}
+  status_check $?
+
+  sed -i -e "s/ROBOSHOP_USER_PASSWORD/${roboshop_app_password}/" /etc/systemd/system/${component}.service &>>${log_file}
+
+  print_head "Reload SystemD"
+  systemctl daemon-reload &>>${log_file}
+  status_check $?
+
+  print_head "Enable ${component} Service "
+  systemctl enable ${component} &>>${log_file}
+  status_check $?
+
+  print_head "Start ${component} Service"
+  systemctl restart ${component} &>>${log_file}
+  status_check $?
+}
+
+schema_setup() {
+  if [ "${schema_type}" == "mongo" ]; then
+    print_head "Copy MongoDB Repo File"
+    cp ${code_dir}/configs/mongodb.repo /etc/yum.repos.d/mongodb.repo &>>${log_file}
     status_check $?
 
-    print_head "Installing Mongo Client"
-    dnf install mongodb-org-shell -y &>>{log_file}
-
+    print_head "Install Mongo Client"
+    yum install mongodb-org-shell -y &>>${log_file}
     status_check $?
 
-    print_head "Loading Schema"
-    mongo --host mongodb.devops69.online </app/schema/${component}.js
+    print_head "Load Schema"
+    mongo --host mongodb-dev.devopsb71.online </app/schema/${component}.js &>>${log_file}
+    status_check $?
+  elif [ "${schema_type}" == "mysql" ]; then
+    print_head "Install MySQL Client"
+    yum install mysql -y &>>${log_file}
+    status_check $?
+
+    print_head "Load Schema"
+    mysql -h mysql-dev.devopsb71.online -uroot -p${mysql_root_password} < /app/schema/shipping.sql &>>${log_file}
     status_check $?
   fi
 }
 
-nodejs(){
+app_prereq_setup() {
+  print_head "Create Roboshop User"
+  id roboshop  &>>${log_file}
+  if [ $? -ne 0 ]; then
+    useradd roboshop &>>${log_file}
+  fi
+  status_check $?
 
-print_head "Enabling nodejs"
-dnf module disable nodejs -y &>>{log_file}
+  print_head "Create Application Directory"
+  if [ ! -d /app ]; then
+    mkdir /app &>>${log_file}
+  fi
+  status_check $?
 
-dnf module enable nodejs:18 -y &>>{log_file}
-dnf install nodejs -y &>>{log_file}
-status_check $?
+  print_head "Delete Old Content"
+  rm -rf /app/* &>>${log_file}
+  status_check $?
 
-print_head "Roboshop UserAdd"
-id roboshop &>>{log_file}
-if [ $? -ne 0 ]; then
-useradd roboshop &>>{log_file}
-fi
-status_check $?
+  print_head "Downloading App Content"
+  curl -L -o /tmp/${component}.zip https://roboshop-artifacts.s3.amazonaws.com/${component}.zip &>>${log_file}
+  status_check $?
+  cd /app
 
-print_head "Creating App Directory"
-if [ ! -d /app ]; then
-mkdir /app &>>{log_file}
-fi
-status_check $?
-
-print_head "Removing Old Content"
-rm -rf /app/*
-status_check $?
-
-print_head "Downloading ${component} Artifacts"
-curl -o /tmp/${component}.zip https://roboshop-artifacts.s3.amazonaws.com/${component}.zip &>>{log_file}
-status_check $?
-
-print_head "Unzipping ${component}.zip"
-cd /app
-unzip /tmp/${component}.zip &>>{log_file}
-cd /app
-status_check $?
-
-print_head "Downloading Node JS Dependencies"
-npm install &>>{log_file}
-status_check $?
-
-print_head "Copying ${component} Config files"
-cp ${code_dir}/configs/${component}.service /etc/systemd/system/${component}.service &>>{log_file}
-status_check $?
-
-print_head "Reloading System D"
-systemctl daemon-reload
-status_check $?
-
-print_head "Enabling ${component}"
-systemctl enable ${component}
-status_check $?
-
-print_head "Starting ${component}"
-systemctl start ${component}
-status_check $?
-
-schema_setup
+  print_head "Extracting App Content"
+  unzip /tmp/${component}.zip &>>${log_file}
+  status_check $?
 }
+
+nodejs() {
+  print_head "Configure NodeJS Repo"
+  curl -sL https://rpm.nodesource.com/setup_lts.x | bash &>>${log_file}
+  status_check $?
+
+  print_head "Install NodeJS"
+  yum install nodejs -y &>>${log_file}
+  status_check $?
+
+  app_prereq_setup
+
+  print_head "Installing NodeJS Dependencies"
+  npm install &>>${log_file}
+  status_check $?
+
+  schema_setup
+
+  systemd_setup
+
+}
+
+java() {
+
+  print_head "Install Maven"
+  yum install maven -y &>>${log_file}
+  status_check $?
+
+  app_prereq_setup
+
+  print_head "Download Dependencies & Package"
+  mvn clean package &>>${log_file}
+  mv target/${component}-1.0.jar ${component}.jar &>>${log_file}
+  status_check $?
+
+  # Schema Setup Function
+  schema_setup
+
+  # SystemD Function
+  systemd_setup
+}
+
+python() {
+
+  print_head "Install Python"
+  yum install python36 gcc python3-devel -y &>>${log_file}
+  status_check $?
+
+  app_prereq_setup
+
+  print_head "Download Dependencies"
+  pip3.6 install -r requirements.txt &>>${log_file}
+  status_check $?
+
+  # SystemD Function
+  systemd_setup
+}
+
