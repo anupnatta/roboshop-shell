@@ -1,0 +1,4 @@
+cp: cannot stat '/f/github.repo/roboshop-shellconfigs/mongodb.repo': No such file or directory
+bash: dnf: command not found
+bash: systemctl: command not found
+bash: systemctl: command not found
